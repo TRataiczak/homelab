@@ -2,13 +2,19 @@
 - name: Bootstrap ansible user on new servers
   hosts: all
   become: yes
-  remote_user: tj
 
   tasks:
 
     - name: Create ansible user
       user:
         name: ansible
+        shell: /bin/bash
+        create_home: yes
+        state: present
+
+    - name: Create tj user
+      user:
+        name: tj
         shell: /bin/bash
         create_home: yes
         state: present
@@ -21,18 +27,28 @@
         group: ansible
         mode: '0700'
 
-    - name: Copy ansible public key to authorized_keys
-      copy:
-        src: ~/.ssh/ansible.pub
-        dest: /home/ansible/.ssh/authorized_keys
-        owner: ansible
-        group: ansible
-        mode: '0600'
+    - name: Add ansible public key
+      authorized_key:
+        user: ansible
+        state: present
+        key: "{{ lookup('file', '../files/ansible.pub') }}"
 
-    - name: Add ansible user to sudoers with no password
+    - name: Add MacBook SSH key for tj
+      authorized_key:
+        user: tj
+        state: present
+        key: "{{ lookup('file', '../files/tj-macbook.pub') }}"
+
+    - name: Add ansible user to sudoers
       copy:
         content: "ansible ALL=(ALL) NOPASSWD:ALL"
         dest: /etc/sudoers.d/ansible
+        mode: '0440'
+
+    - name: Add tj to sudoers
+      copy:
+        content: "tj ALL=(ALL) NOPASSWD:ALL"
+        dest: /etc/sudoers.d/tj
         mode: '0440'
 
     - name: Install sudo (Debian)
