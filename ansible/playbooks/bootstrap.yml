@@ -1,0 +1,36 @@
+---
+- name: Bootstrap ansible user on new servers
+  hosts: all
+  become: yes
+  remote_user: tj
+
+  tasks:
+
+    - name: Create ansible user
+      user:
+        name: ansible
+        shell: /bin/bash
+        create_home: yes
+        state: present
+
+    - name: Create .ssh directory for ansible user
+      file:
+        path: /home/ansible/.ssh
+        state: directory
+        owner: ansible
+        group: ansible
+        mode: '0700'
+
+    - name: Copy ansible public key to authorized_keys
+      copy:
+        src: ~/.ssh/ansible.pub
+        dest: /home/ansible/.ssh/authorized_keys
+        owner: ansible
+        group: ansible
+        mode: '0600'
+
+    - name: Add ansible user to sudoers with no password
+      copy:
+        content: "ansible ALL=(ALL) NOPASSWD:ALL"
+        dest: /etc/sudoers.d/ansible
+        mode: '0440'
