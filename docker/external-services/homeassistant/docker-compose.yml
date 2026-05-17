@@ -1,0 +1,34 @@
+services:
+  homeassistant:
+    image: linuxserver/homeassistant:latest
+    container_name: homeassistant
+    restart: unless-stopped
+    networks:
+      - proxy
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    ports:
+      - "8123:8123"
+    volumes:
+      - /opt/homeassistant/config:/config
+      - /dev:/dev
+    devices:
+      - /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_46b4d2482d80ef11a5f2181cedd322a4-if00-port0:/dev/ttyUSB0
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homeassistant.entrypoints=http"
+      - "traefik.http.routers.homeassistant.rule=Host(`smarthome.rataiczak.com`)"
+      - "traefik.http.routers.homeassistant.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.homeassistant-secure.entrypoints=https"
+      - "traefik.http.routers.homeassistant-secure.rule=Host(`smarthome.rataiczak.com`)"
+      - "traefik.http.routers.homeassistant-secure.tls=true"
+      - "traefik.http.routers.homeassistant-secure.tls.certresolver=cloudflare"
+      - "traefik.http.routers.homeassistant-secure.middlewares=default-headers@docker"
+      - "traefik.http.routers.homeassistant-secure.service=homeassistant"
+      - "traefik.http.services.homeassistant.loadbalancer.server.port=8123"
+
+networks:
+  proxy:
+    external: true
