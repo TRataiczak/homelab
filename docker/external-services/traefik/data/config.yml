@@ -1,0 +1,31 @@
+http:
+
+  routers:
+    proxmox:
+      entryPoints:
+        - https
+      rule: "Host(`proxmox.rataiczak.com`)"
+      tls: {}
+      service: proxmox
+      middlewares:
+        - default-headers
+
+  services:
+    proxmox:
+      loadBalancer:
+        servers:
+          - url: "https://10.0.20.3:8006"
+        passHostHeader: true
+
+  middlewares:
+    default-headers:
+      headers:
+        frameDeny: true
+        browserXssFilter: true
+        contentTypeNosniff: true
+        forceSTSHeader: true
+        stsSeconds: 15552000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        customRequestHeaders:
+          X-Forwarded-Proto: https
