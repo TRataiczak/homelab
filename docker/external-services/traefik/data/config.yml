@@ -9,12 +9,27 @@ http:
       service: proxmox
       middlewares:
         - default-headers
+    
+    nas:
+      entryPoints:
+        - https
+      rule: "Host(`nas.rataiczak.com`)"
+      tls: {}
+      service: nas
+      middlewares:
+        - default-headers
 
   services:
     proxmox:
       loadBalancer:
         servers:
           - url: "https://10.0.20.3:8006"
+        passHostHeader: true
+    
+    nas:
+      loadBalancer:
+        servers:
+          - url: "https://10.0.20.4:5001"
         passHostHeader: true
 
   middlewares:

@@ -3,14 +3,10 @@ services:
     image: linuxserver/homeassistant:latest
     container_name: homeassistant
     restart: unless-stopped
-    networks:
-      - proxy
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=America/New_York
-    ports:
-      - "8123:8123"
     volumes:
       - /opt/homeassistant/config:/config
       - /dev:/dev
@@ -28,6 +24,8 @@ services:
       - "traefik.http.routers.homeassistant-secure.middlewares=default-headers@docker"
       - "traefik.http.routers.homeassistant-secure.service=homeassistant"
       - "traefik.http.services.homeassistant.loadbalancer.server.port=8123"
+    networks:
+      - proxy
 
 networks:
   proxy:

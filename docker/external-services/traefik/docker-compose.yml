@@ -3,8 +3,6 @@ services:
     image: traefik:latest
     container_name: traefik
     restart: unless-stopped
-    networks:
-      - proxy
     ports:
       - 80:80
       - 443:443
@@ -42,7 +40,9 @@ services:
       - "traefik.http.middlewares.default-headers.headers.stsSeconds=15552000"
       - "traefik.http.middlewares.default-headers.headers.stsIncludeSubdomains=true"
       - "traefik.http.middlewares.default-headers.headers.stsPreload=true"
-
+    networks:
+      - proxy
+      
 networks:
   proxy:
     external: true
