@@ -1,0 +1,37 @@
+services:
+  littlelink:
+    image: ghcr.io/timothystewart6/littlelink-server:latest
+    container_name: littlelink
+    restart: unless-stopped
+    environment:
+      - META_TITLE=TJ Rataiczak
+      - META_DESCRIPTION=System Administrator
+      - META_AUTHOR=TJ Rataiczak
+      - OG_SITE_NAME=TJ Rataiczak
+      - OG_TITLE=TJ Rataiczak
+      - OG_DESCRIPTION=TJ Rataiczak links
+      - OG_URL=https://links.rataiczak.com
+      - NAME=TJ Rataiczak
+      - BIO=System Administrator
+      - THEME=Dark
+      - LINKED_IN=https://www.linkedin.com/in/tjrataiczak/
+      - GITHUB=https://github.com/TRataiczak
+      - FOOTER=TJ Rataiczak © 2026
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.littlelink.entrypoints=http"
+      - "traefik.http.routers.littlelink.rule=Host(`links.rataiczak.com`)"
+      - "traefik.http.routers.littlelink.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.littlelink-secure.entrypoints=https"
+      - "traefik.http.routers.littlelink-secure.rule=Host(`links.rataiczak.com`)"
+      - "traefik.http.routers.littlelink-secure.tls=true"
+      - "traefik.http.routers.littlelink-secure.tls.certresolver=cloudflare"
+      - "traefik.http.routers.littlelink-secure.middlewares=default-headers@docker"
+      - "traefik.http.routers.littlelink-secure.service=littlelink"
+      - "traefik.http.services.littlelink.loadbalancer.server.port=3000"
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
