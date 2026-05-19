@@ -1,0 +1,25 @@
+services:
+  actualbudget:
+    image: actualbudget/actual-server:latest
+    container_name: actualbudget
+    restart: unless-stopped
+    volumes:
+      - /opt/actualbudget/data:/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.actualbudget.entrypoints=http"
+      - "traefik.http.routers.actualbudget.rule=Host(`budget.rataiczak.com`)"
+      - "traefik.http.routers.actualbudget.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.actualbudget-secure.entrypoints=https"
+      - "traefik.http.routers.actualbudget-secure.rule=Host(`budget.rataiczak.com`)"
+      - "traefik.http.routers.actualbudget-secure.tls=true"
+      - "traefik.http.routers.actualbudget-secure.tls.certresolver=cloudflare"
+      - "traefik.http.routers.actualbudget-secure.middlewares=default-headers@docker"
+      - "traefik.http.routers.actualbudget-secure.service=actualbudget"
+      - "traefik.http.services.actualbudget.loadbalancer.server.port=5006"
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
