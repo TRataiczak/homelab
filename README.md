@@ -13,7 +13,6 @@ This repository contains the complete infrastructure-as-code, configuration, and
 | RAT-PROD-01 | External services, reverse proxy | HP EliteDesk — Intel i7-12700T, 16GB RAM |
 | RAT-ANSIBLE-01 | Ansible control node | Bare metal Fedora Server |
 | RAT-PROX-01 | Hypervisor, test VMs | Proxmox VE — 16 threads, 128GB RAM |
-| RAT-NAS-01 | Storage, backups | Synology 5-bay NAS |
 | RAT-WORK-01 | Personal workstation | Fedora Workstation |
 | RAT-NET-01 | Router, firewall, DNS | Ubiquiti UDM Pro |
 | RAT-SW-01 | Core switching | Unifi 48-port PoE |
