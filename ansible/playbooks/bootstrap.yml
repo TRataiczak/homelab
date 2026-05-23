@@ -33,10 +33,16 @@
         state: present
         key: "{{ lookup('file', '../files/ansible.pub') }}"
 
-    - name: Add MacBook SSH key for tj
+    - name: Add RAT-WORK-01 public key for tj
       authorized_key:
         user: tj
         state: present
+        key: "{{ lookup('file', '../files/tj-desktop.pub') }}"
+
+    - name: Remove MacBook SSH key for tj
+      authorized_key:
+        user: tj
+        state: absent
         key: "{{ lookup('file', '../files/tj-macbook.pub') }}"
 
     - name: Add ansible user to sudoers
