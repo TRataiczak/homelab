@@ -1,0 +1,135 @@
+---
+# RAT-PROD-01 configuration playbook
+# Configures a fresh Fedora server into a fully running production services host
+# Usage: ansible-playbook playbooks/prod-server.yml --limit RAT-PROD-01
+
+- name: Configure RAT-PROD-01
+  hosts: RAT-PROD-01
+  become: yes
+
+  tasks:
+
+    - name: Install Docker dependencies
+      dnf:
+        name:
+          - dnf-plugins-core
+        state: present
+        update_cache: yes
+
+    - name: Add Docker repo
+      command: dnf config-manager addrepo --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo
+      args:
+        creates: /etc/yum.repos.d/docker-ce.repo
+
+    - name: Install Docker
+      dnf:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+
+    - name: Enable and start Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Add tj to docker group
+      user:
+        name: tj
+        groups: docker
+        append: yes
+
+    - name: Add ansible to docker group
+      user:
+        name: ansible
+        groups: docker
+        append: yes
+
+    - name: Create proxy Docker network
+      community.docker.docker_network:
+        name: proxy
+        state: present
+
+    - name: Create service directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: tj
+        group: tj
+        mode: '0755'
+      loop:
+        - /opt/traefik
+        - /opt/traefik/data
+        - /opt/homeassistant
+        - /opt/homeassistant/config
+        - /opt/portainer
+        - /opt/portainer/data
+        - /opt/actualbudget
+        - /opt/actualbudget/data
+        - /opt/littlelink
+        - /opt/glance
+        - /opt/glance/config
+        - /opt/glance/assets
+        - /opt/mealie
+        - /opt/mealie/data
+
+    - name: Copy Traefik configs
+      copy:
+        src: "../../docker/external-services/traefik/{{ item }}"
+        dest: "/opt/traefik/{{ item }}"
+        owner: tj
+        group: tj
+      loop:
+        - docker-compose.yml
+        - data/traefik.yml
+        - data/config.yml
+
+    - name: Create Traefik acme.json
+      file:
+        path: /opt/traefik/data/acme.json
+        state: touch
+        owner: tj
+        group: tj
+        mode: '0600'
+
+    - name: Template Traefik .env
+      template:
+        src: ../templates/traefik.env.j2
+        dest: /opt/traefik/.env
+        owner: tj
+        group: tj
+        mode: '0600'
+
+    - name: Copy service compose files
+      copy:
+        src: "../../docker/external-services/{{ item }}/docker-compose.yml"
+        dest: "/opt/{{ item }}/docker-compose.yml"
+        owner: tj
+        group: tj
+      loop:
+        - homeassistant
+        - portainer
+        - actualbudget
+        - littlelink
+        - glance
+        - mealie
+
+    - name: Start Traefik
+      community.docker.docker_compose_v2:
+        project_src: /opt/traefik
+        state: present
+
+    - name: Start all services
+      community.docker.docker_compose_v2:
+        project_src: "/opt/{{ item }}"
+        state: present
+      loop:
+        - homeassistant
+        - portainer
+        - actualbudget
+        - littlelink
+        - glance
+        - mealie

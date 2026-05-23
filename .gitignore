@@ -1,3 +1,4 @@
 **/.env
 **/acme.json
 **/secrets.yaml
+./vault_pass
