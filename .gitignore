@@ -2,3 +2,7 @@
 **/acme.json
 **/secrets.yaml
 ./vault_pass
+**/*.tfvars
+**/.terraform
+**/*.tfstate
+**/*.tfstate.backup
