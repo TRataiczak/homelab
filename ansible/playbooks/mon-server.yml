@@ -48,26 +48,27 @@
         groups: docker
         append: yes
 
-    - name: Create monitoring service directories
+    - name: Create Docker monitoring network
+      community.docker.docker_network:
+        name: monitoring
+        state: present
+
+    - name: Create Uptime Kuma directory
       file:
-        path: "{{ item }}"
+        path: /opt/monitoring/uptime-kuma/data
         state: directory
         owner: tj
         group: tj
         mode: '0755'
-      loop:
-        - /opt/monitoring
-        - /opt/monitoring/prometheus
-        - /opt/monitoring/prometheus/config
-        - /opt/monitoring/grafana
-        - /opt/monitoring/grafana/data
-        - /opt/monitoring/loki
-        - /opt/monitoring/loki/config
-        - /opt/monitoring/loki/data
-        - /opt/monitoring/uptime-kuma
-        - /opt/monitoring/uptime-kuma/data
 
-    - name: Create Docker monitoring network
-      community.docker.docker_network:
-        name: monitoring
+    - name: Copy Uptime Kuma compose file
+      copy:
+        src: ../../docker/monitoring/uptime-kuma/docker-compose.yml
+        dest: /opt/monitoring/uptime-kuma/docker-compose.yml
+        owner: tj
+        group: tj
+
+    - name: Start Uptime Kuma
+      community.docker.docker_compose_v2:
+        project_src: /opt/monitoring/uptime-kuma
         state: present

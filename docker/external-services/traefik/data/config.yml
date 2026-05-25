@@ -9,12 +9,27 @@ http:
       service: proxmox
       middlewares:
         - proxmox-headers
+    
+    uptime:
+      entryPoints:
+        - https
+      rule: "Host(`uptime.rataiczak.com`)"
+      tls: {}
+      service: uptime
+      middlewares:
+        - default-headers
 
   services:
     proxmox:
       loadBalancer:
         servers:
           - url: "https://10.0.20.3:8006"
+        passHostHeader: true
+
+    uptime:
+      loadBalancer:
+        servers:
+          - url: "http://10.0.20.5:3001"
         passHostHeader: true
 
   middlewares:
