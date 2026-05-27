@@ -39,6 +39,12 @@
         state: present
         key: "{{ lookup('file', '../files/tj-desktop.pub') }}"
 
+    - name: Add MacBook SSH key for tj
+      authorized_key:
+        user: tj
+        state: present
+        key: "{{ lookup('file', '../files/tj-macbook.pub') }}"
+
     - name: Add ansible user to sudoers
       copy:
         content: "ansible ALL=(ALL) NOPASSWD:ALL"
