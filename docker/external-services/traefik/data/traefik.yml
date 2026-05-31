@@ -17,6 +17,8 @@ providers:
   docker:
     endpoint: "unix:///var/run/docker.sock"
     exposedByDefault: false
+    watch: true
+    pollInterval: 5s
   file:
     filename: /config.yml
     watch: true
