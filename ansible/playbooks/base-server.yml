@@ -1,23 +1,9 @@
 ---
-# Base server configuration - run on all managed servers after bootstrap
+# Base configuration - run on all managed servers
 # Usage: ansible-playbook playbooks/base-server.yml
 
-- name: Base server configuration
+- name: Apply base configuration to all servers
   hosts: all
   become: yes
-
-  tasks:
-
-    - name: Update all packages (RHEL)
-      dnf:
-        name: "*"
-        state: latest
-        update_cache: yes
-      when: ansible_facts['os_family'] == "RedHat"
-
-    - name: Update all packages (Debian)
-      apt:
-        name: "*"
-        state: latest
-        update_cache: yes
-      when: ansible_facts['os_family'] == "Debian"
+  roles:
+    - base
