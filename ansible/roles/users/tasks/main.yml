@@ -1,0 +1,33 @@
+---
+- name: Create managed users
+  user:
+    name: "{{ item.name }}"
+    shell: /bin/bash
+    create_home: yes
+    state: present
+  loop: "{{ managed_users }}"
+
+- name: Create .ssh directories
+  file:
+    path: "/home/{{ item.name }}/.ssh"
+    state: directory
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+    mode: '0700'
+  loop: "{{ managed_users }}"
+
+- name: Deploy authorized keys
+  authorized_key:
+    user: "{{ item.name }}"
+    state: present
+    key: "{{ lookup('file', item.pubkey) }}"
+  loop: "{{ managed_users }}"
+  when: item.pubkey is defined
+
+- name: Configure passwordless sudo
+  copy:
+    content: "{{ item.name }} ALL=(ALL) NOPASSWD:ALL\n"
+    dest: "/etc/sudoers.d/{{ item.name }}"
+    mode: '0440'
+  loop: "{{ managed_users }}"
+  when: item.sudo | default(false)

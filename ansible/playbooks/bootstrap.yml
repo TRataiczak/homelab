@@ -3,56 +3,5 @@
   hosts: all
   become: yes
 
-  tasks:
-
-    - name: Create ansible user
-      user:
-        name: ansible
-        shell: /bin/bash
-        create_home: yes
-        state: present
-
-    - name: Create tj user
-      user:
-        name: tj
-        shell: /bin/bash
-        create_home: yes
-        state: present
-
-    - name: Create .ssh directory for ansible user
-      file:
-        path: /home/ansible/.ssh
-        state: directory
-        owner: ansible
-        group: ansible
-        mode: '0700'
-
-    - name: Add ansible public key
-      authorized_key:
-        user: ansible
-        state: present
-        key: "{{ lookup('file', '../files/ansible.pub') }}"
-
-    - name: Add RAT-WORK-01 public key for tj
-      authorized_key:
-        user: tj
-        state: present
-        key: "{{ lookup('file', '../files/tj-desktop.pub') }}"
-
-    - name: Add ansible user to sudoers
-      copy:
-        content: "ansible ALL=(ALL) NOPASSWD:ALL"
-        dest: /etc/sudoers.d/ansible
-        mode: '0440'
-
-    - name: Add tj to sudoers
-      copy:
-        content: "tj ALL=(ALL) NOPASSWD:ALL"
-        dest: /etc/sudoers.d/tj
-        mode: '0440'
-
-    - name: Install sudo (Debian)
-      apt:
-        name: sudo
-        state: present
-      when: ansible_facts['os_family'] == "Debian"
+  roles:
+    - users

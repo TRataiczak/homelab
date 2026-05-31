@@ -1,0 +1,7 @@
+managed_users:
+  - name: ansible
+    pubkey: ansible.pub
+    sudo: true
+  - name: tj
+    pubkey: tj.pub
+    sudo: true
