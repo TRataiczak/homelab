@@ -1,0 +1,6 @@
+---
+- name: Install Docker
+  hosts: RAT-PROD-01
+  become: yes
+  roles:
+    - docker

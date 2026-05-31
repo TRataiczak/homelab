@@ -1,0 +1,30 @@
+---
+- name: Install Docker dependencies
+  dnf:
+    name: dnf-plugins-core
+    state: present
+    update_cache: yes
+
+- name: Add Docker repo
+  command: dnf config-manager addrepo --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo
+  args:
+    creates: /etc/yum.repos.d/docker-ce.repo
+  changed_when: false
+
+- name: Install Docker
+  dnf:
+    name: "{{ docker_packages }}"
+    state: present
+
+- name: Enable and start Docker
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Add users to docker group
+  user:
+    name: "{{ item }}"
+    groups: docker
+    append: yes
+  loop: "{{ docker_group_users }}"
