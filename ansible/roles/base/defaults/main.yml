@@ -1,0 +1,13 @@
+common_packages_rhel:
+  - vim
+  - curl
+  - git
+  - htop
+  - wget
+
+common_packages_debian:
+  - vim
+  - curl
+  - git
+  - htop
+  - wget
