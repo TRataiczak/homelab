@@ -18,11 +18,10 @@
 
 - name: Deploy authorized keys
   authorized_key:
-    user: "{{ item.name }}"
+    user: "{{ item.0.name }}"
     state: present
-    key: "{{ lookup('file', item.pubkey) }}"
-  loop: "{{ managed_users }}"
-  when: item.pubkey is defined
+    key: "{{ lookup('file', item.1) }}"
+  loop: "{{ managed_users | subelements('pubkeys', skip_missing=True) }}"
 
 - name: Configure passwordless sudo
   copy:
