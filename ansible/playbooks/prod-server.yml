@@ -87,22 +87,6 @@
         - data/traefik.yml
         - data/config.yml
 
-    - name: Create Traefik acme.json
-      file:
-        path: /opt/traefik/data/acme.json
-        state: touch
-        owner: tj
-        group: tj
-        mode: '0600'
-
-    - name: Template Traefik .env
-      template:
-        src: ../templates/traefik.env.j2
-        dest: /opt/traefik/.env
-        owner: tj
-        group: tj
-        mode: '0600'
-
     - name: Copy service compose files
       copy:
         src: "../../docker/external-services/{{ item }}/docker-compose.yml"
