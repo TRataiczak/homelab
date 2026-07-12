@@ -7,7 +7,3 @@ managed_users:
     pubkeys:
       - tj-desktop.pub
     sudo: true
-  - name: tj
-    pubkeys:
-      - tj-macbook.pub
-    sudo: true
